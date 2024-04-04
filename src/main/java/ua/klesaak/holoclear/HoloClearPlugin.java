@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 public final class HoloClearPlugin extends JavaPlugin implements Listener {
     public static final Pattern TIME_PATTERN = Pattern.compile("(time)", Pattern.LITERAL);
+    public static final Pattern COUNT_PATTERN = Pattern.compile("(count)", Pattern.LITERAL);
     private int clearTimeInSeconds;
     private String icon;
     private final List<ItemEntity> entityList = new ArrayList<>(1024);

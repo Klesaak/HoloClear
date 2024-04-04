@@ -1,4 +1,4 @@
-#Time after which the item will be deleted.
+#Time in seconds, after which the item will be deleted.
 clearTime: 20
 #Icom of the dropped item.
-icon: "&c⚠&6 (time)"
+icon: "&c⚠&6 (time) (count)"

@@ -3,9 +3,11 @@ package ua.klesaak.holoclear;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Projectile;
 import ua.klesaak.holoclear.util.UtilityMethods;
 
-import static ua.klesaak.holoclear.HoloClearPlugin.TIME_PATTERN;
+import static ua.klesaak.holoclear.HoloClearPlugin.*;
 
 @Getter @Setter
 public class ItemEntity {
@@ -19,7 +21,13 @@ public class ItemEntity {
    }
 
    public void decrementTime(String customName) {
-      this.entity.setCustomName(UtilityMethods.replaceAll(TIME_PATTERN, customName, ()-> String.valueOf(this.time)));
+      String name = UtilityMethods.replaceAll(TIME_PATTERN, customName, ()-> String.valueOf(this.time));
+      if (entity instanceof Projectile) {
+         name = UtilityMethods.replaceAll(COUNT_PATTERN, name, ()-> String.valueOf(1));
+      } else {
+         name = UtilityMethods.replaceAll(COUNT_PATTERN, name, ()-> String.valueOf(((Item) entity).getItemStack().getAmount()));
+      }
+      this.entity.setCustomName(name);
       this.time--;
    }
 }
