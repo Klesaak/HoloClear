@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,9 +21,9 @@ public class UtilityMethods {
      * @param replacement the replacement
      * @return the input string with the replacements applied
      */
-    public String replaceAll(Pattern pattern, String input, Supplier<String> replacement) {
+    public String replaceAll(Pattern pattern, String input, Supplier<Object> replacement) {
         Matcher matcher = pattern.matcher(input);
-        if (matcher.find()) return matcher.replaceAll(Matcher.quoteReplacement(replacement.get()));
+        if (matcher.find()) return matcher.replaceAll(Matcher.quoteReplacement(String.valueOf(replacement.get())));
         return input;
     }
 
