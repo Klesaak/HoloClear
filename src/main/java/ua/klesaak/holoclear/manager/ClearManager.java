@@ -1,6 +1,7 @@
 package ua.klesaak.holoclear.manager;
 
 import lombok.val;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -15,7 +16,10 @@ import ua.klesaak.holoclear.HoloClearPlugin;
 import ua.klesaak.holoclear.util.MCColorUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 //todo commands, disabledWorlds
@@ -24,7 +28,7 @@ public class ClearManager implements Listener {
     public static final Pattern COUNT_PATTERN = Pattern.compile("(count)", Pattern.LITERAL);
 
     private final HoloClearPlugin holoClearPlugin;
-    private final List<ItemEntity> entityList = new ArrayList<>(1024);
+    private final Set<ItemEntity> entityList = Collections.newSetFromMap(new ConcurrentHashMap<>(1024));
 
     private BukkitTask clearTask;
     private int clearTimeInSeconds;
@@ -36,9 +40,9 @@ public class ClearManager implements Listener {
         this.reload();
         val server = this.holoClearPlugin.getServer();
         server.getPluginManager().registerEvents(this, this.holoClearPlugin);
-        this.clearTask = server.getScheduler().runTaskTimerAsynchronously(this.holoClearPlugin, () -> {
-            for(int i = 0; i < this.entityList.size(); ++i) {
-                ItemEntity item = this.entityList.get(i);
+        this.clearTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.holoClearPlugin, () -> {
+            System.out.println("SIZE: " + this.entityList.size());
+            for(ItemEntity item : this.entityList) {
                 if (item.getEntity().getLocation().getWorld().getEntities().isEmpty()) {
                     this.entityList.remove(item);
                 } else if (item.getTime() <= 0) {
@@ -48,21 +52,20 @@ public class ClearManager implements Listener {
                     item.decrementTime(this.icon);
                 }
             }
-        }, 20L, 20L);
+        }, 0, 20L);
 
-        for (World world : server.getWorlds()) {
-            Chunk[] loadedChunks = world.getLoadedChunks();
-            for (int loadedChunksLength = loadedChunks.length, i = 0; i < loadedChunksLength; ++i) {
-                Chunk chunk = loadedChunks[i];
-                Entity[] entities = chunk.getEntities();
-                for (int entitiesLength = entities.length, j = 0; j < entitiesLength; ++j) {
-                    Entity entity = entities[j];
-                    if (entity instanceof Projectile || entity instanceof Item) {
-                        this.entityList.add(new ItemEntity(entity, this.clearTimeInSeconds));
+        Bukkit.getScheduler().runTaskLater(this.holoClearPlugin, () -> {
+            for (World world : server.getWorlds()) {
+                for (Chunk chunk : world.getLoadedChunks()) {
+                    for (Entity entity : chunk.getEntities()) {
+                        if (entity instanceof Projectile || entity instanceof Item) {
+                            this.entityList.add(new ItemEntity(entity, this.clearTimeInSeconds));
+                            System.out.println("ADDED ENTITY: " + entity.getEntityId());
+                        }
                     }
                 }
             }
-        }
+        }, 50L);
     }
 
     public void reload() {
