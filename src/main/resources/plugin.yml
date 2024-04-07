@@ -1,4 +1,0 @@
-name: HoloClear
-version: '${project.version}'
-main: ua.klesaak.holoclear.HoloClearPlugin
-api-version: '1.16'

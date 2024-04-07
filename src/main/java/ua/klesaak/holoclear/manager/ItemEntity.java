@@ -7,7 +7,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Projectile;
 import ua.klesaak.holoclear.util.UtilityMethods;
 
-import static ua.klesaak.holoclear.manager.ClearManager.*;
+import static ua.klesaak.holoclear.configuration.ConfigFile.*;
 
 @Getter @Setter
 public class ItemEntity {
@@ -29,5 +29,9 @@ public class ItemEntity {
       }
       this.entity.setCustomName(name);
       this.time--;
+   }
+
+   public void remove() {
+      this.entity.remove();
    }
 }
