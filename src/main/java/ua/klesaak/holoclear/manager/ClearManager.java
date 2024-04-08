@@ -12,8 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
 import ua.klesaak.holoclear.HoloClearPlugin;
 import ua.klesaak.holoclear.command.ReloadCommand;
@@ -76,7 +75,6 @@ public class ClearManager implements Listener {
                 if (entity instanceof Projectile || entity instanceof Item) {
                     this.entityList.add(new ItemEntity(entity, this.configFile.getClearTimeInSeconds()));
                 }
-                System.out.println("ENTITIES LENGTH: " + chunk.getEntities().length);
             }
         }
     }
@@ -96,9 +94,13 @@ public class ClearManager implements Listener {
     }
 
     @EventHandler
-    public void onWorldLoadEvent(WorldInitEvent e) { //todo не работает сука
+    public void onWorldLoadEvent(ChunkLoadEvent e) {
         val world = e.getWorld();
         if (this.configFile.isDisabledWorld(world)) return;
-        this.loadAllDropFromWorld(world);
+        for (Entity entity : e.getChunk().getEntities()) {
+            if (entity instanceof Projectile || entity instanceof Item) {
+                this.entityList.add(new ItemEntity(entity, this.configFile.getClearTimeInSeconds()));
+            }
+        }
     }
 }
